@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <!-- import CSS -->
+    <link rel="stylesheet" href="./element-index.css">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0">
+
+</head>
+<body>
+<div id="app">
+    <h1>{{version.title}}</h1>
+    <el-divider></el-divider>
+    <el-timeline>
+        <el-timeline-item size="large" v-for="item in version.logs" :timestamp="item.version" placement="top">
+            <el-card>
+                <div v-if="item.contentFeature && item.contentFeature.length>0">
+                    <h2>特性</h2>
+                    <ul>
+                        <li v-for="text in item.contentFeature">{{text}}</li>
+                    </ul>
+                </div>
+                <div v-if="item.contentBug && item.contentBug.length>0">
+                    <h2>BUG修复</h2>
+                    <ul>
+                        <li v-for="text in item.contentBug">{{text}}</li>
+                    </ul>
+                </div>
+                <p>更新于 {{item.date}}</p>
+            </el-card>
+        </el-timeline-item>
+    </el-timeline>
+</div>
+</body>
+<!-- import Vue before Element -->
+<script src="./vue.js"></script>
+<!-- import JavaScript -->
+<script src="./element-index.js"></script>
+<script>
+    new Vue({
+        el: '#app',
+        data: function () {
+            return {
+                version: {}
+            }
+        },
+        mounted() {
+            let that = this
+            const xhr = new XMLHttpRequest();  //这里没有考虑IE浏览器，如果需要择if判断加
+            xhr.open('GET', "./version.json", true);
+            xhr.send(null);
+            xhr.onreadystatechange = function () {
+                if (xhr.status === 200 && xhr.readyState === 4) {
+                    let json = JSON.parse(xhr.response)
+                    console.log('a', json)
+                    that.version = Object.assign({}, this.version, json)
+                    console.log(that)
+                    document.title = that.version.title
+                }
+            }
+        }
+    })
+</script>
+<style>
+    .el-timeline-item__timestamp {
+        font-size: 25px;
+    }
+
+    li {
+        display: list-item;
+        text-align: -webkit-match-parent;
+    }
+
+    ul {
+        list-style-type: disc;
+    }
+</style>
+</html>
